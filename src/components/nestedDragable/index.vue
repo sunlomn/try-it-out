@@ -55,7 +55,7 @@
     @end="onEnd"
   >
   <template #item="{element}" >
-    <el-card v-if="element.name=='选中标签'" class="selectedContainer" shadow="never" >
+    <el-card v-if="element.name=='选中标签'" class="selectedContainer" shadow="never"  >
     <div>{{ element.name }}</div>
     <el-checkbox v-model="allChecked" @change="checkAllHandle"  :indeterminate="isIndeterminate" >全选</el-checkbox>
     <el-divider />
@@ -101,7 +101,7 @@ export default {
   computed: {
     dragOptions() {
       return {
-        animation: 0,
+        animation: 100,
         disabled: false,
         ghostClass: "ghost",
         
@@ -109,7 +109,7 @@ export default {
     },
     draginsideOptions() {
       return {
-        animation: 0,
+        animation:100,
        
         disabled: false,
         ghostClass: "ghost"
