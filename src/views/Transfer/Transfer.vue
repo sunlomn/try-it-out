@@ -4,7 +4,9 @@
     <el-row >
       <el-col :span="6">
         <h3>Nested draggable</h3>
-        <nested-draggable :list="list" :subitemClass="selectedItems" :isOutside="isOUtside" :currentChosen="currentChosen" @itemselected="itemupdateleft" @itemunselected="itemunselectedleft" @itemChosen="itemChosenLeft" @itemUnchosen="itemUnchosen" @chooseAll="chooseHandleLeft"/>
+        <nested-draggable :list="list" :subitemClass="selectedItems" :isOutside="isOUtside" :currentChosen="currentChosen" 
+        @itemselected="itemupdateleft" @itemunselected="itemunselectedleft" @itemChosen="itemChosenLeft" @itemUnchosen="itemUnchosen" @chooseAll="chooseHandleLeft"
+        @list-search="listSearchleft"/>
       </el-col>
       <div style="align-items: center;display: flex;margin: 10px;flex-flow: column">
         <el-row style="margin:10px"><el-button type="primary" @click.native="l2r"><el-icon><DArrowRight /></el-icon></el-button>  </el-row>
@@ -12,7 +14,9 @@
       </div>
       <el-col  :span="6">
         <h3>Nested draggable</h3>
-        <nested-draggable :list="list2" :subitemClass="selectedItems" :isOutside="isOUtside" :currentChosen="currentChosen" @itemselected="itemupdateRight" @itemunselected="itemunselectedRight" @itemChosen="itemChosenRight" @itemUnchosen="itemUnchosen" @chooseAll="chooseHandleRight"/>
+        <nested-draggable :list="list2" :subitemClass="selectedItems" :isOutside="isOUtside" :currentChosen="currentChosen" 
+        @itemselected="itemupdateRight" @itemunselected="itemunselectedRight" @itemChosen="itemChosenRight" 
+        @itemUnchosen="itemUnchosen" @chooseAll="chooseHandleRight" @list-search="listSearchRight"/>
       </el-col>
     </el-row>
   </template>
@@ -46,6 +50,12 @@
           },
           {
             name: "task 3",id:1,
+          },
+          {
+            name: "贪吃蛇",id:9,
+          },
+          {
+            name: "贪心鼠",id:19,
           },
           {
             name: "task 5",id:2,
@@ -169,6 +179,34 @@
         }
         this.list2[0].children.splice(0,this.list2[0].children.length);
       },
+      listSearchleft(value){
+        var newList=[];
+       
+        for(var i=1;i<this.list.length;i++){
+          if(this.list[i].name.includes(value)){
+            newList.unshift(this.list[i]);
+          }
+          else{
+            newList.push(this.list[i]);
+          }
+        }
+        newList.unshift(this.list[0]);
+        this.list=newList;
+      },
+      listSearchRight(value){
+        var newList=[];
+       
+        for(var i=1;i<this.list2.length;i++){
+          if(this.list2[i].name.includes(value)){
+            newList.unshift(this.list2[i]);
+          }
+          else{
+            newList.push(this.list2[i]);
+          }
+        }
+        newList.unshift(this.list2[0]);
+        this.list2=newList;
+      }
     },
     watch:{
       list2:{

@@ -58,6 +58,11 @@
     <el-card v-if="element.name=='选中标签'" class="selectedContainer" shadow="never"  >
     <div>{{ element.name }}</div>
     <el-checkbox v-model="allChecked" @change="checkAllHandle"  :indeterminate="isIndeterminate" >全选</el-checkbox>
+    <el-input v-model="searchStuff" clearable class="w-50 m-2" placeholder="搜索" @input="searchMethod">
+        <template #prefix>
+          <el-icon class="el-input__icon"><search /></el-icon>
+        </template>
+      </el-input>
     <el-divider />
     <nestedDragable   :list="element.children" @itemunselected="unselectItem" />
     </el-card>
@@ -125,7 +130,10 @@ export default {
     list:{
       handler(newVal,oldVal){
         if(this.isOutside){
-          console.log(newVal);
+          if(!this.isStoreed){
+            this.originList=newVal;
+            this.isStoreed=true
+          }
           if(newVal[0].children.length>0&&newVal.length>1){
             this.isIndeterminate=true;
           }
@@ -140,7 +148,8 @@ export default {
         }
       },
       deep:true,
-    }
+    },
+    
   },
   props: {
     list: {
@@ -159,6 +168,9 @@ export default {
         checked:true,
         isIndeterminate:false,
         allChecked:false,
+        searchStuff:"",
+        originList:[],
+        isStoreed:false,
     })
     
   },
@@ -175,6 +187,9 @@ methods:{
   unselectItem(element){
     this.$emit("itemunselected",element);
     console.log("itemunselected");
+  },
+  searchMethod(value){
+    this.$emit("list-search",value);
   },
   cloneFunction(element){
     
