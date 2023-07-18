@@ -76,7 +76,7 @@
     <div v-if="extand" style="display: flex;flex-direction: column;align-items: center;margin-top: 5px;">
     <el-icon @click="shortenChild"><ArrowUpBold /></el-icon></div>
     </el-card>
-    <div v-else>
+    <div v-else class="normalItem">
         <el-checkbox class="item"  @change="selectedItem(element)">{{ element.name }}</el-checkbox>
     </div>
   </template>
@@ -223,7 +223,6 @@ methods:{
   },
   unselectItem(element){
     this.$emit("itemunselected",element);
-    console.log("itemunselected");
   },
   searchMethod(value){
     this.$emit("list-search",value);
@@ -231,7 +230,6 @@ methods:{
   cloneFunction(element){
     
     if(Object.keys(element).indexOf("children")!=-1){
-      console.log(element);
         return element.children;
     }
     else{
@@ -246,6 +244,10 @@ methods:{
       if(e.from==e.to){
         return false;
       }
+    }
+    if(e.to!=e.from&&e.to.classList.contains("item-innercontainer")&&e.dragged.classList.contains("normalItem")){return false;}
+    if(e.dragged.classList.contains("item-sub")){
+      if(e.to.classList.contains("item-innercontainer")){return false;}
     }
     if(e.relatedContext.element){
        if(Object.keys(e.relatedContext.element).indexOf("children")!=-1){
@@ -290,8 +292,6 @@ methods:{
   shortenChild(){
     this.$emit("shortenChild");
   }
- 
 },
-
 };
 </script>

@@ -241,7 +241,6 @@
             }
           }
           if(newVal[0].children.length>3&&!this.rightExtand){
-            console.log("chaole")
             var newList=[];
             for(var i=2;i<newVal[0].children.length;i++){
               if(newVal[0].children[i].else){
@@ -256,10 +255,8 @@
             if(newVal[0].children[2].else){
             
               newVal[0].children[2].else.push(newList[0]);
-              console.log(newVal[0].children[2])
             }
             else{
-              console.log(newVal[0].children)
               newVal[0].children.push(elseObject);
             }
           }
@@ -268,13 +265,19 @@
       },
       list:{
         handler(newVal,oldVal){
-          console.log("list1");
           var index=0;
           for(;index<newVal.length;index++){
-           
             if(Array.isArray(newVal[index])){
-              console.log(newVal[index]);
               var oldArray=newVal[index];
+              newVal.splice(index,1);
+              var i=0;
+              for(;i<oldArray.length;i++){
+                newVal.splice(index,0,oldArray[i]);
+              }
+            }
+            if(newVal[index].else){
+              console.log(newVal[index].else);
+              var oldArray=newVal[index].else;
               newVal.splice(index,1);
               var i=0;
               for(;i<oldArray.length;i++){
