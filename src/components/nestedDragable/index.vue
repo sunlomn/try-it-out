@@ -10,7 +10,7 @@
   box-shadow: 3px 2px 5px -1px rgba(128, 131, 135, 0.36);
 }
 .item-innercontainer {
-  min-height: 20px;
+  min-height: 20px;width: 100%;
 }
 
 .item {
@@ -29,13 +29,20 @@
 }
 .selectedContainer{
   border-radius: 4px;
-  border: solid aliceblue 1px;
+  border: solid rgb(0, 102, 255) 1px;
   background-color: rgb(240, 248, 255);
   margin: 5px 5px 5px 5px;
+  box-shadow: 2px,2px,2px,grey;
 }
 .el-card :deep(.el-card__body) {
   padding: 10px;
- 
+}
+.sub-else{
+  display: flex;
+  flex-direction: row;
+}
+.tagsub{
+  margin-right: 5px;
 }
 </style>
 
@@ -64,7 +71,10 @@
         </template>
       </el-input>
     <el-divider />
-    <nestedDragable   :list="element.children" @itemunselected="unselectItem" />
+   
+    <nestedDragable   :list="element.children" @itemunselected="unselectItem"  @childExtand="childExtand"/>
+    <div v-if="extand" style="display: flex;flex-direction: column;align-items: center;margin-top: 5px;">
+    <el-icon @click="shortenChild"><ArrowUpBold /></el-icon></div>
     </el-card>
     <div v-else>
         <el-checkbox class="item"  @change="selectedItem(element)">{{ element.name }}</el-checkbox>
@@ -83,8 +93,19 @@
     @choose="onChoose"
     @end="onEnd"
   >
-  <template #item="{element}">
-    <el-checkbox class="item-sub" @change="unselectItem(element)" :checked="checked">{{ element.name }}</el-checkbox>
+  <template #item="{element}" >
+    <div v-if="element.else" class="item-sub sub-else">
+    <div style="display:flex;flex-direction:row;align-items: start;width:70%">
+      <div v-for="item in findformer(element.else,3,'array')">
+        <el-tag class="ml-2 tagsub"  type="info">{{item.name}}</el-tag>
+      </div>
+      <el-tag class="ml-2 tagsub" v-if="findformer(element.else,3,'num')>0" type="info">+{{findformer(element.else,3,'num')}}</el-tag>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items: end;width: 30%;">
+      <el-icon @click="childExtand"><ArrowDownBold /></el-icon>
+    </div>
+    </div>
+    <el-checkbox v-else class="item-sub" @change="unselectItem(element)" :checked="checked">{{ element.name }}</el-checkbox>
   </template>
   </draggable>
 </div>
@@ -152,6 +173,7 @@ export default {
     
   },
   props: {
+    extand:false,
     list: {
       required: false,
       type: Array,
@@ -175,6 +197,21 @@ export default {
     
   },
 methods:{
+  findformer(array,num,type){
+    if(array.length<=num&&type=='array'){
+      return array;
+    }
+    if(array.length>num&&type=='array'){
+      return array.slice(0,num);
+    }
+    if(array.length>num&&type=='num'){
+      console.log(array.length-num)
+      return array.length-num;
+    }
+    else{
+      return 0;
+    }
+  },
   ismiddle(){
     console.log(this.list);
     if(this.list[0].children.length>0&&this.list.length>1){
@@ -247,6 +284,12 @@ methods:{
   putfunction(){
     return true;
   },
+  childExtand(){
+    this.$emit("childExtand")
+  },
+  shortenChild(){
+    this.$emit("shortenChild");
+  }
  
 },
 

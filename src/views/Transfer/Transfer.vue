@@ -14,8 +14,8 @@
       </div>
       <el-col  :span="6">
         <h3>Nested draggable</h3>
-        <nested-draggable :list="list2" :subitemClass="selectedItems" :isOutside="isOUtside" :currentChosen="currentChosen" 
-        @itemselected="itemupdateRight" @itemunselected="itemunselectedRight" @itemChosen="itemChosenRight" 
+        <nested-draggable :list="list2" :subitemClass="selectedItems" :isOutside="isOUtside" :currentChosen="currentChosen" :extand="rightExtand"
+        @itemselected="itemupdateRight" @itemunselected="itemunselectedRight" @itemChosen="itemChosenRight"  @childExtand="extandRight" @shortenChild="shortenChildRight"
         @itemUnchosen="itemUnchosen" @chooseAll="chooseHandleRight" @list-search="listSearchRight"/>
       </el-col>
     </el-row>
@@ -33,6 +33,7 @@
     },
     data() {
       return {
+        rightExtand:false,
         currentChosen:{
           currentSide:-1,
           isSelected:false,
@@ -87,6 +88,7 @@
       };
     },
     methods:{
+    //将选择的元素放入已选择对象的子元素数组中 
       itemupdateleft(el){
         console.log(JSON.stringify(el));
         var indexRule=(element)=>element.name==el.name&&element.id==el.id;
@@ -95,13 +97,6 @@
          this.list[0].children.push(this.list[index]);
          this.list.splice(index,1);
       },
-      itemunselectedleft(el){
-        var indexRule=(element)=>element.name==el.name&&element.id==el.id;
-        var index=this.list[0].children.findIndex(indexRule)
-        console.log(index);
-         this.list.push(this.list[0].children[index]);
-         this.list[0].children.splice(index,1);
-      },
       itemupdateRight(el){
         console.log(JSON.stringify(el));
         var indexRule=(element)=>element.name==el.name&&element.id==el.id;
@@ -109,6 +104,14 @@
         console.log(index);
          this.list2[0].children.push(this.list2[index]);
          this.list2.splice(index,1);
+      },
+      //将被取消选择的元素推入整体数组的最后
+      itemunselectedleft(el){
+        var indexRule=(element)=>element.name==el.name&&element.id==el.id;
+        var index=this.list[0].children.findIndex(indexRule)
+        console.log(index);
+         this.list.push(this.list[0].children[index]);
+         this.list[0].children.splice(index,1);
       },
       itemunselectedRight(el){
         var indexRule=(element)=>element.name==el.name&&element.id==el.id;
@@ -206,6 +209,18 @@
         }
         newList.unshift(this.list2[0]);
         this.list2=newList;
+      },
+      extandRight(){
+        this.rightExtand=true;
+        var list=this.list2[0].children[2].else;
+        this.list2[0].children.splice(2,1);
+        this.list2[0].children=this.list2[0].children.concat(list);
+      },
+      shortenChildRight(){
+        var list=[...this.list2[0].children.slice(2)];
+        this.list2[0].children.splice(2,this.list2[0].children.length-2);
+        this.list2[0].children.push({"else":list});
+        this.rightExtand=true;
       }
     },
     watch:{
@@ -223,6 +238,29 @@
               for(;i<oldArray.length;i++){
                 newVal.splice(index,0,oldArray[i]);
               }
+            }
+          }
+          if(newVal[0].children.length>3&&!this.rightExtand){
+            console.log("chaole")
+            var newList=[];
+            for(var i=2;i<newVal[0].children.length;i++){
+              if(newVal[0].children[i].else){
+                newList=newVal[0].children[i].else;
+              }
+              else{
+                newList.push(newVal[0].children[i]);
+              }
+              newVal[0].children.splice(i,1);
+            }
+            var elseObject={"else":newList};
+            if(newVal[0].children[2].else){
+            
+              newVal[0].children[2].else.push(newList[0]);
+              console.log(newVal[0].children[2])
+            }
+            else{
+              console.log(newVal[0].children)
+              newVal[0].children.push(elseObject);
             }
           }
         },
