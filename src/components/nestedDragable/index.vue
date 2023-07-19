@@ -257,7 +257,6 @@ methods:{
     return true;
   },
   onChoose(el){
-    console.log(el.item.classList);
     if((el.item.classList).contains("selectedContainer")){
       console.log("选择的是选中框")
       this.$emit("itemChosen",true);

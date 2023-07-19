@@ -4,9 +4,9 @@
     <el-row >
       <el-col :span="6">
         <h3>Nested draggable</h3>
-        <nested-draggable :list="list" :subitemClass="selectedItems" :isOutside="isOUtside" :currentChosen="currentChosen" 
-        @itemselected="itemupdateleft" @itemunselected="itemunselectedleft" @itemChosen="itemChosenLeft" @itemUnchosen="itemUnchosen" @chooseAll="chooseHandleLeft"
-        @list-search="listSearchleft"/>
+        <nested-draggable :list="list" :subitemClass="selectedItems" :isOutside="isOUtside" :currentChosen="currentChosen" :extand="leftExtand"
+        @itemselected="itemupdateleft" @itemunselected="itemunselectedleft" @itemChosen="itemChosenLeft" @childExtand="extandLeft" @shortenChild="shortenChildLeft" 
+        @itemUnchosen="itemUnchosen" @chooseAll="chooseHandleLeft" @list-search="listSearchleft"/>
       </el-col>
       <div style="align-items: center;display: flex;margin: 10px;flex-flow: column">
         <el-row style="margin:10px"><el-button type="primary" @click.native="l2r"><el-icon><DArrowRight /></el-icon></el-button>  </el-row>
@@ -34,6 +34,7 @@
     data() {
       return {
         rightExtand:false,
+        leftExtand:false,
         currentChosen:{
           currentSide:-1,
           isSelected:false,
@@ -172,13 +173,27 @@
       l2r(){
         console.log("l2r");
         for(var i=0;i<this.list[0].children.length;i++){
-          this.list2.push(this.list[0].children[i]);
+          if(this.list[0].children[i].else){
+            for(var j=0;j<this.list[0].children[i].else.length;j++){
+              this.list2.push(this.list[0].children[i].else[j]);
+            }
+          }
+          else{
+            this.list2.push(this.list[0].children[i]);
+          } 
         }
         this.list[0].children.splice(0,this.list[0].children.length);
       },
       r2l(){
         for(var i=0;i<this.list2[0].children.length;i++){
-          this.list.push(this.list2[0].children[i]);
+          if(this.list2[0].children[i].else){
+            for(var j=0;j<this.list2[0].children[i].else.length;j++){
+              this.list.push(this.list2[0].children[i].else[j]);
+            }
+          }
+          else{
+            this.list.push(this.list2[0].children[i]);
+          } 
         }
         this.list2[0].children.splice(0,this.list2[0].children.length);
       },
@@ -221,6 +236,19 @@
         this.list2[0].children.splice(2,this.list2[0].children.length-2);
         this.list2[0].children.push({"else":list});
         this.rightExtand=true;
+      },
+      extandLeft(){
+       
+        this.leftExtand=true;
+        var listnew=this.list[0].children[2].else;
+        this.list[0].children.splice(2,1);
+        this.list[0].children=this.list[0].children.concat(listnew);
+      },
+      shortenChildLeft(){
+        var list=[...this.list[0].children.slice(2)];
+        this.list[0].children.splice(2,this.list[0].children.length-2);
+        this.list[0].children.push({"else":list});
+        this.rightExtand=true;
       }
     },
     watch:{
@@ -229,7 +257,6 @@
           console.log("list2");
           var index=0;
           for(;index<newVal.length;index++){
-           
             if(Array.isArray(newVal[index])){
               console.log(newVal[index]);
               var oldArray=newVal[index];
@@ -260,6 +287,22 @@
               newVal[0].children.push(elseObject);
             }
           }
+          if(newVal[0].children.length<3){
+            this.leftExtand=false;
+            console.log(newVal[0].children.length);
+            if(newVal[0].children.length>0){
+              if(Object.keys(newVal[0].children[newVal[0].children.length-1]).indexOf("else")>=0){
+              if(newVal[0].children[newVal[0].children.length-1].else.length>1){
+                newVal[0].children.splice(-1,0,newVal[0].children[newVal[0].children.length-1].else[0]);
+                newVal[0].children[newVal[0].children.length-1].else.shift();
+              }
+              else{
+                newVal[0].children.splice(-1,1,newVal[0].children[newVal[0].children.length-1].else[0]);
+              }
+            }
+            }
+            
+          }
         },
         deep:true,
       },
@@ -284,6 +327,40 @@
                 newVal.splice(index,0,oldArray[i]);
               }
             }
+          }
+          if(newVal[0].children.length>3&&!this.leftExtand){
+            var newList=[];
+            for(var i=2;i<newVal[0].children.length;i++){
+              if(newVal[0].children[i].else){
+                newList=newVal[0].children[i].else;
+              }
+              else{
+                newList.push(newVal[0].children[i]);
+              }
+              newVal[0].children.splice(i,1);
+            }
+            var elseObject={"else":newList};
+            if(newVal[0].children[2].else){
+            
+              newVal[0].children[2].else.push(newList[0]);
+            }
+            else{
+              newVal[0].children.push(elseObject);
+            }
+          }
+          if(newVal[0].children.length<3){
+            this.leftExtand=false;
+            if(newVal[0].children.length>0){
+              if(Object.keys(newVal[0].children[newVal[0].children.length-1]).indexOf("else")>=0){
+                if(newVal[0].children[newVal[0].children.length-1].else.length>1){
+                  newVal[0].children.splice(-1,0,newVal[0].children[newVal[0].children.length-1].else[0]);
+                  newVal[0].children[newVal[0].children.length-1].else.shift();
+                }
+                else{
+                  newVal[0].children.splice(-1,1,newVal[0].children[newVal[0].children.length-1].else[0]);
+                }
+              }
+            } 
           }
         },
         deep:true,
